@@ -81,7 +81,7 @@ class RateCalculator(QtWidgets.QMainWindow, Ui_main_window):
         :param soe_com: number
             another percentage discount
         :return: string
-            a string representing a float
+            a string of pretty printed local currency
         """
 
         if key == "rack_rate_edit":
@@ -108,7 +108,7 @@ class RateCalculator(QtWidgets.QMainWindow, Ui_main_window):
         if key == "soe_total_edit":
             entry = lodging_functions.add_tax(lodging_functions.expedia_price(rack, soe_dis, soe_com), sales, lodge)
 
-        return str(entry)
+        return lodging_functions.make_currency_pretty(entry)
 
     def set_values(self, name, settings):
         """
@@ -126,13 +126,13 @@ class RateCalculator(QtWidgets.QMainWindow, Ui_main_window):
         :return: void
 
         """
-        value = settings.value(name, type=float)
-        sales = settings.value('sales_tax_edit', type=float) / 100
-        lodge = settings.value('lodging_tax_edit', type=float)
-        aaa = settings.value('aaa_discount_edit', type=float) / 100
-        man = settings.value('lbms_discount_edit', type=float) / 100
-        soe_dis = settings.value('soe_discount_edit', type=float) / 100
-        soe_com = settings.value('soe_commission_edit', type=float) / 100
+        value = float(settings.value(name, type=str).replace("$", ""))
+        sales = float(settings.value('sales_tax_edit', type=str).replace("$", "")) / 100
+        lodge = float(settings.value('lodging_tax_edit', type=str).replace("$", ""))
+        aaa = float(settings.value('aaa_discount_edit', type=str).replace("$", "")) / 100
+        man = float(settings.value('lbms_discount_edit', type=str).replace("$", "")) / 100
+        soe_dis = float(settings.value('soe_discount_edit', type=str).replace("$", "")) / 100
+        soe_com = float(settings.value('soe_commission_edit', type=str).replace("$", "")) / 100
 
         if name == "rack_rate_edit":
             rack = value
