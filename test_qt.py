@@ -6,25 +6,25 @@ Created on Sat Nov 18 19:57:20 2017
 """
 
 import sys
-from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, 
-    QTextEdit, QGridLayout, QApplication)
+from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit,
+                             QTextEdit, QGridLayout, QApplication)
 
 
+# noinspection PyPep8Naming
 class Example(QWidget):
-    
     def __init__(self):
         super().__init__()
-        
+
         self.initUI()
-        
-        
+
+    # noinspection PyPep8Naming
     def initUI(self):
-        
         title = QLabel('Title')
         author = QLabel('Author')
         review = QLabel('Review')
 
         titleEdit = QLineEdit()
+        # noinspection PyPep8Naming
         authorEdit = QLineEdit()
         reviewEdit = QTextEdit()
 
@@ -39,16 +39,15 @@ class Example(QWidget):
 
         grid.addWidget(review, 3, 0)
         grid.addWidget(reviewEdit, 3, 1, 5, 1)
-        
-        self.setLayout(grid) 
-        
+
+        self.setLayout(grid)
+
         self.setGeometry(300, 300, 350, 300)
-        self.setWindowTitle('Review')    
+        self.setWindowTitle('Review')
         self.show()
-        
-        
+
+
 if __name__ == '__main__':
-    
     app = QApplication(sys.argv)
     ex = Example()
     sys.exit(app.exec_())

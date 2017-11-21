@@ -7,13 +7,15 @@ Created on Fri Nov 17 21:16:10 2017
 
 
 # %%
+import ctypes
+import sys
+
 import tkinter
 from tkinter import ttk
-import sys
-import ctypes
 
 
 # %%
+# noinspection PyShadowingNames
 def clear_fields():
     for child in main_window.winfo_children():
         if isinstance(child, ttk.Entry):
@@ -21,20 +23,17 @@ def clear_fields():
 
 
 # %%
-def configure_constants():
-    
+# def configure_constants():
 
 
 # %%
 if 'win' in sys.platform:
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
-
 # %%
 root = tkinter.Tk()
 root.title("Rate Calculator")
 root.option_add('*tearoff', False)
-
 
 # %%
 menubar = tkinter.Menu(root)
@@ -43,10 +42,8 @@ menu_configure = tkinter.Menu(menubar)
 menubar.add_cascade(menu=menu_configure, label='Configure')
 menu_configure.add_command(label='Constants')  # command=configure_constants)
 
-
 # %%
 main_window = ttk.Frame(root, padding=(3, 3, 12, 12))
-
 
 # %%
 # Create Labels
@@ -56,7 +53,6 @@ rack_label = ttk.Label(main_window, text="RACK")
 aaa_label = ttk.Label(main_window, text="AAA")
 lbws_label = ttk.Label(main_window, text="LBWS")
 soe_label = ttk.Label(main_window, text="SOE")
-
 
 # %%
 # Create entry (text) fields
@@ -69,12 +65,10 @@ lbws_total_entry = ttk.Entry(main_window)
 soe_rate_entry = ttk.Entry(main_window)
 soe_total_entry = ttk.Entry(main_window)
 
-
 # %%
 # Create Buttons
 clear_button = ttk.Button(main_window, text="Clear", command=clear_fields)
 calculate_button = ttk.Button(main_window, text="Calculate")
-
 
 # %%
 # Divide the main window into an arbitrary size grid,
@@ -94,7 +88,6 @@ aaa_label.grid(column=1, row=3)
 lbws_label.grid(column=1, row=4)
 soe_label.grid(column=1, row=5)
 
-
 # %%
 # Rate entries along the left under the Rate Label
 # Total entries along the right under the Total Label
@@ -110,12 +103,10 @@ lbws_total_entry.grid(column=3, row=4)
 soe_rate_entry.grid(column=2, row=5)
 soe_total_entry.grid(column=3, row=5)
 
-
 # %%
 # Buttons placed at the bottom right of the grid, anchored
 clear_button.grid(column=3, row=6, sticky=(tkinter.S, tkinter.E))
 calculate_button.grid(column=4, row=6, sticky=(tkinter.S, tkinter.W))
-
 
 # %%
 # Shortcut to assign common settings
@@ -124,7 +115,7 @@ calculate_button.grid(column=4, row=6, sticky=(tkinter.S, tkinter.W))
 # Buttons are padded horizontally
 for child in main_window.winfo_children():
 
-    if isinstance(child, ttk.Label) and not(rate_label or total_label):
+    if isinstance(child, ttk.Label) and not (rate_label or total_label):
         child.grid_configure(sticky=(tkinter.E, tkinter.S), padx=5)
 
     elif isinstance(child, ttk.Entry):
@@ -132,7 +123,6 @@ for child in main_window.winfo_children():
 
     elif isinstance(child, ttk.Button):
         child.grid_configure(padx=5)
-
 
 # %%
 # Relative weights for stretching and resizing various elements of the window

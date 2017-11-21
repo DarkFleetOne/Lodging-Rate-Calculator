@@ -7,17 +7,19 @@ Created on Fri Nov 17 18:17:18 2017
 
 
 # %%
+import ctypes
 from tkinter import *
 from tkinter import ttk
+
 import lodging_functions
-import ctypes
-import sys
 
 
 # %%
-def calculate(*args):
+# noinspection PyArgumentList
+def calculate():
     try:
         acc = float(total.get())
+        # noinspection PyArgumentList
         rate.set(lodging_functions.make_currency_pretty(lodging_functions.remove_tax(acc)))
     except ValueError:
         pass
@@ -55,7 +57,7 @@ ttk.Label(mainframe, text="Rate").grid(column=3, row=2, sticky=W)
 
 
 # %%
-# shortcut to add padding around each of the grid elements, smoothens resizing
+# shortcut to add padding around each of the grid elements, smooths resizing
 for child in mainframe.winfo_children():
     child.grid_configure(padx=5, pady=5)
 

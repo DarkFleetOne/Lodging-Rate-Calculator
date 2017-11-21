@@ -8,14 +8,15 @@ Module with functions to save & restore qt widget values
 """
 
 # %%
-import sys
-from PyQt5 import QtWidgets, QtCore
-import inspect
 import distutils
+import inspect
+import sys
+
+from PyQt5 import QtWidgets
 
 
 # %%
-def data_save(ui, settings):
+def gui_save(ui, settings):
     """
     Save "ui" controls and values to registry "settings"
     currently handles QComboBox, QLineEdit, QCheckBox,
@@ -31,23 +32,24 @@ def data_save(ui, settings):
 
     """
     # Save geometry
-    settings.setValue('size', ui.size())
-    settings.setValue('pos', ui.pos())
+    # settings.setValue('size', ui.size())
+    # settings.setValue('pos', ui.pos())
 
-    #for child in ui.children():  # works like getmembers, but because it traverses the hierarachy, you would have to call guisave recursively to traverse down the tree
+    # for child in ui.children():  # works like getmembers, but because it traverses the hierarchy, you would have
+    # to call gui_save recursively to traverse down the tree
 
     for name, obj in inspect.getmembers(ui):
-        #if type(obj) is QComboBox:  # this works similar to isinstance, but missed some field... not sure why?
+        # if type(obj) is QComboBox:  # this works similar to isinstance, but missed some field... not sure why?
         if isinstance(obj, QtWidgets.QComboBox):
-            name = obj.objectName()      # get combobox name
-            index = obj.currentIndex()    # get current index from combobox
-            text = obj.itemText(index)   # get the text for current index
-            settings.setValue(name, text)   # save combobox selection to registry
+            name = obj.objectName()  # get combobox name
+            index = obj.currentIndex()  # get current index from combobox
+            text = obj.itemText(index)  # get the text for current index
+            settings.setValue(name, text)  # save combobox selection to registry
 
         if isinstance(obj, QtWidgets.QLineEdit):
             name = obj.objectName()
             value = obj.text()
-            settings.setValue(name, value)    # save ui values, so they can be restored next time
+            settings.setValue(name, value)  # save ui values, so they can be restored next time
 
         if isinstance(obj, QtWidgets.QCheckBox):
             name = obj.objectName()
@@ -57,14 +59,14 @@ def data_save(ui, settings):
         if isinstance(obj, QtWidgets.QRadioButton):
             name = obj.objectName()
             value = obj.isChecked()
-            settings.setValue(name,value)
+            settings.setValue(name, value)
 
         if isinstance(obj, QtWidgets.QSpinBox):
             name = obj.objectName()
             value = obj.value()
             settings.setValue(name, value)
 
-        if isinstance(obj,QtWidgets.QSlider):
+        if isinstance(obj, QtWidgets.QSlider):
             name = obj.objectName()
             value = obj.value()
             settings.setValue(name, value)
@@ -81,7 +83,7 @@ def data_save(ui, settings):
 
 
 # %%
-def data_load(ui, settings):
+def gui_load(ui, settings):
     """
     Restore "ui" controls with values stored in registry "settings"
     currently handles QComboBox, QLineEdit, QCheckBox,
@@ -97,12 +99,12 @@ def data_load(ui, settings):
 
     """
     # Restore Geometry
-    ui.resize(settings.value('size', QtCore.QSize(293, 282))) # Set Size for first launch
-    ui.move(settings.value('pos', QtCore.QPoint(100,100))) # Initial sreen position
+    # ui.resize(settings.value('size', QtCore.QSize(293, 282)))  # Set Size for first launch
+    # ui.move(settings.value('pos', QtCore.QPoint(100, 100)))  # Initial sreen position
 
     for name, obj in inspect.getmembers(ui):
         if isinstance(obj, QtWidgets.QComboBox):
-            index = obj.currentIndex()    # get current region from combobox
+            # index = obj.currentIndex()  # get current region from combobox
             # text = obj.itemText(index)   # get the text for new selected index
             name = obj.objectName()
 
@@ -111,14 +113,14 @@ def data_load(ui, settings):
             if value == "":
                 continue
 
-            index = obj.findText(value)   # get the corresponding index for specified string in combobox
+            index = obj.findText(value)  # get the corresponding index for specified string in combobox
 
             if index == -1:  # add to list if not found
                 obj.insertItems(0, [value])
                 index = obj.findText(value)
                 obj.setCurrentIndex(index)
             else:
-                obj.setCurrentIndex(index)   # preselect a combobox value by index    
+                obj.setCurrentIndex(index)  # preselect a combobox value by index
 
         if isinstance(obj, QtWidgets.QLineEdit):
             name = obj.objectName()
@@ -127,7 +129,7 @@ def data_load(ui, settings):
 
         if isinstance(obj, QtWidgets.QCheckBox):
             name = obj.objectName()
-            value = settings.value(name)   # get stored value from registry
+            value = settings.value(name)  # get stored value from registry
             if value is not None:
                 obj.setChecked(distutils.util.strtobool(value))  # restore checkbox
 

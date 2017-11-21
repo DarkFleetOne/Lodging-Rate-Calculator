@@ -7,16 +7,19 @@ Created on Sat Nov 18 18:57:53 2017
 
 # %%
 import sys
+
 from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QGridLayout, QApplication, QPushButton)
 
 
 # %%
-class Rate_calculator(QWidget):
+# noinspection SpellCheckingInspection
+class RateCalculator(QWidget):
     def __init__(self):
         super().__init__()
 
         self.initUI()
 
+    # noinspection PyPep8Naming,SpellCheckingInspection
     def initUI(self):
         rate_label = QLabel('Rate')
         total_label = QLabel('Total')
@@ -31,6 +34,7 @@ class Rate_calculator(QWidget):
         aaa_rate_edit = QLineEdit()
         aaa_total_edit = QLineEdit()
 
+        # noinspection SpellCheckingInspection
         lbms_rate_edit = QLineEdit()
         lbms_total_edit = QLineEdit()
 
@@ -78,6 +82,6 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
     else:
         app = QApplication.instance()
-    window = Rate_calculator()
+    window = RateCalculator()
     window.show()
     sys.exit(app.exec_())
