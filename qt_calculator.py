@@ -32,19 +32,6 @@ Ui_dialog, QtBaseClass = uic.loadUiType(dialog_creator)
 
 
 # %%
-def calculate_values(name, settings):
-    value = settings.value(name, type=float)
-    sales = settings.value('sales_tax_edit', type=float) / 100
-    lodging = settings.value('lodging_tax_edit', type=float)
-    # noinspection PyUnusedLocal
-    aaa_discount = settings.value('aaa_discount_edit', type=float) / 100
-    if name == "rack_rate_edit":
-        # noinspection PyPep8
-        settings.setValue('rack_total_edit', lodging_functions.make_currency_pretty(
-                lodging_functions.add_tax(rate=value, sales_tax=sales, lodging_tax=lodging)))
-
-
-# %%
 """
 Load QtDesigner file for the main window
 Use to create a Rate_Calculator class
@@ -69,11 +56,121 @@ class RateCalculator(QtWidgets.QMainWindow, Ui_main_window):
     def show_constants_dialog(self):
         self.dialog.show()
 
+    @staticmethod
+    def calculate(key, rack, sales, lodge, aaa, man, soe_dis, soe_com):
+        """
+        Auxiliary function for set_values.
+        Given a key, a default rate, and discount amounts
+        Returns a string using the appropriate function from lodging_functions
+        in this module, keys are assigned per QLineEdit
+
+        :param key: string
+            A string representing the name of the value in the database
+        :param rack: number
+            The default rate
+        :param sales: number
+            a percentage sales tax
+        :param lodge: number
+            a flat rate lodging tax
+        :param aaa: number
+            a percentage discount
+        :param man: number
+            another percentage discount
+        :param soe_dis: number
+            another percentage discount
+        :param soe_com: number
+            another percentage discount
+        :return: string
+            a string representing a float
+        """
+
+        if key == "rack_rate_edit":
+            entry = rack
+
+        if key == "rack_total_edit":
+            entry = lodging_functions.add_tax(rack, sales, lodge)
+
+        if key == "aaa_rate_edit":
+            entry = lodging_functions.apply_discount(rack, aaa)
+
+        if key == "aaa_total_edit":
+            entry = lodging_functions.add_tax(lodging_functions.apply_discount(rack, aaa), sales, lodge)
+
+        if key == "lbms_rate_edit":
+            entry = lodging_functions.apply_discount(rack, man)
+
+        if key == "lbms_total_edit":
+            entry = lodging_functions.add_tax(lodging_functions.apply_discount(rack, man), sales, lodge)
+
+        if key == "soe_rate_edit":
+            entry = lodging_functions.expedia_price(rack, soe_dis, soe_com)
+
+        if key == "soe_total_edit":
+            entry = lodging_functions.add_tax(lodging_functions.expedia_price(rack, soe_dis, soe_com), sales, lodge)
+
+        return str(entry)
+
+    def set_values(self, name, settings):
+        """
+        Defines a set of constants for the calculate function from the given database,
+        Determines the default rate depending on the name of the QLineEdit using lodging_functions,
+        For each QLineEdit of the parent class, sets its value in the database to the value returned by calculate
+            when given its key-name.
+
+        :param name: string
+            The name of a QWidget object of the parent class
+
+        :param settings: QSettings object
+            A database managed by QSettings in the operating system's persistent memory
+
+        :return: void
+
+        """
+        value = settings.value(name, type=float)
+        sales = settings.value('sales_tax_edit', type=float) / 100
+        lodge = settings.value('lodging_tax_edit', type=float)
+        aaa = settings.value('aaa_discount_edit', type=float) / 100
+        man = settings.value('lbms_discount_edit', type=float) / 100
+        soe_dis = settings.value('soe_discount_edit', type=float) / 100
+        soe_com = settings.value('soe_commission_edit', type=float) / 100
+
+        if name == "rack_rate_edit":
+            rack = value
+
+        if name == "rack_total_edit":
+            rack = lodging_functions.remove_tax(value, sales, lodge)
+
+        if name == "aaa_rate_edit":
+            rack = lodging_functions.remove_discount(value, aaa)
+
+        if name == "aaa_total_edit":
+            rack = lodging_functions.remove_discount(lodging_functions.remove_tax(value, sales, lodge), aaa)
+
+        if name == "lbms_rate_edit":
+            rack = lodging_functions.remove_discount(value, man)
+
+        if name == "lbms_total_edit":
+            rack = lodging_functions.remove_discount(lodging_functions.remove_tax(value, sales, lodge), man)
+
+        if name == "soe_rate_edit":
+            rack = lodging_functions.rate_from_expedia(value, soe_dis, soe_com)
+
+        if name == "soe_total_edit":
+            # noinspection PyPep8
+            rack = lodging_functions.rate_from_expedia(lodging_functions.remove_tax(value, sales, lodge), soe_dis, soe_com)
+
+        else:
+            print("Error! Focus object not known QLineEdit!")
+
+        for key, obj in inspect.getmembers(self):
+            if isinstance(obj, QtWidgets.QLineEdit):
+                settings.setValue(key, self.calculate(key, rack, sales, lodge, aaa, man, soe_dis, soe_com))
+
     def calculate_clicked(self):
         qt_persistence.gui_save(self, data)
         if isinstance(QtWidgets.QApplication.focusWidget(), QtWidgets.QLineEdit):
             name = QtWidgets.QApplication.focusWidget().objectName()
-            calculate_values(name, data)
+            self.set_values(name, data)
             qt_persistence.gui_load(self, data)
 
     def clear_line_edits(self):
