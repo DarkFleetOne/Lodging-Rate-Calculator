@@ -107,7 +107,7 @@ def make_currency_pretty(number):
 
     Example
     -------
-    >>> make_pretty_currency(101.954)
+    >> make_pretty_currency(101.954)
     $101.95
 
     """
@@ -200,6 +200,7 @@ def apply_discount(rate, discount):
 
     Parameters
     ----------
+
     rate: number
         a number representing a currency value
 
@@ -283,7 +284,7 @@ def expedia_price(rate, discount, commission):
 # %%
 def rate_from_expedia(total, discount, commission):
     """
-    Given an Expedia.com rate and the associatdd discount and commision,
+    Given an Expedia.com rate and the associated discount and commission,
     returns the original rack rate
 
     Parameters
