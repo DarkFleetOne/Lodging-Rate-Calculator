@@ -46,7 +46,7 @@ QtBaseClass is thrown out, contains QMainWindow without path
 class RateCalculator(QtWidgets.QMainWindow, generated_window_qt.Ui_Rate_Calculator):
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
-        Ui_main_window.__init__(self)
+        generated_window_qt.Ui_Rate_Calculator.__init__(self)
         self.setupUi(self)
         self.dialog = ConstantsDialog(self)
         self.calculate_button.setFocusPolicy(QtCore.Qt.NoFocus)
@@ -205,7 +205,7 @@ QTBaseClass is thrown out, contains QDialog without path
 class ConstantsDialog(QtWidgets.QDialog, generated_dialog_qt.Ui_Constants_Dialog):
     def __init__(self, parent=None):
         QtWidgets.QDialog.__init__(self)
-        Ui_dialog.__init__(self)
+        generated_dialog_qt.Ui_Constants_Dialog.__init__(self)
         self.setupUi(self)
         self.close_button.clicked.connect(self.close_clicked)
         self.save_button.clicked.connect(self.save_clicked)
@@ -223,17 +223,22 @@ class ConstantsDialog(QtWidgets.QDialog, generated_dialog_qt.Ui_Constants_Dialog
             self.close()
 
 
-# %%
 # Workaround Qt main loop for Spyder development
 # Prevent segfault from running 2 instances of PyQt at once
-# if __name__ == "__main__":
+def main():
+    global app
+    if not QtWidgets.QApplication.instance():
+        app = QtWidgets.QApplication(sys.argv)
 
-if not QtWidgets.QApplication.instance():
-    app = QtWidgets.QApplication(sys.argv)
+    else:
+        app = QtWidgets.QApplication.instance()
 
-else:
-    app = QtWidgets.QApplication.instance()
+    window = RateCalculator()
+    window.show()
+    sys.exit(app.exec_())
 
-window = RateCalculator()
-window.show()
-sys.exit(app.exec_())
+
+# %%
+
+if __name__ == "__main__":
+    main()

@@ -26,6 +26,7 @@ if sys.platform == "win32":
 # Dependencies are automatically detected, but can be explicitly declared
 options = {
     'build_exe': {
+        'build_exe': 'Lodging Rate Calculator',
         'optimize': 2,
         'includes': [
             'atexit',
@@ -39,7 +40,7 @@ options = {
     }
 
 executables = [
-    Executable('qt_calculator.py', base=base)
+    Executable(script='qt_calculator.py', base=base, targetName="Lodging Rate Calculator")
     ]
 
 setup(
@@ -67,10 +68,8 @@ setup(
 
                   ],
         keywords='simple Qt lodging rate calculator',
-        install_requires=['pyqt5'],
+        install_requires=['pyqt5', "cx_freeze"],
         python_requires='~=3.3',
         package_data={'data.ini': ['data.ini'], 'Qt_plugins': ['Qt_plugins/*.ui']},
-        py_modules=["lodging_functions", "qt_calculator", "qt_persistence"]
+        py_modules=["lodging_functions", "qt_calculator", "qt_manipulation"]
 )
-
-
