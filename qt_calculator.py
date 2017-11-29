@@ -14,6 +14,9 @@ from PyQt5 import uic, QtWidgets, QtCore
 
 import lodging_functions
 import qt_persistence
+import generated_dialog_qt
+import generated_window_qt
+
 
 # %%
 # noinspection SpellCheckingInspection
@@ -40,7 +43,7 @@ QtBaseClass is thrown out, contains QMainWindow without path
 """
 
 
-class RateCalculator(QtWidgets.QMainWindow, Ui_main_window):
+class RateCalculator(QtWidgets.QMainWindow, generated_window_qt.Ui_Rate_Calculator):
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
         Ui_main_window.__init__(self)
@@ -199,7 +202,7 @@ QTBaseClass is thrown out, contains QDialog without path
 
 
 # noinspection PyUnusedLocal
-class ConstantsDialog(QtWidgets.QDialog, Ui_dialog):
+class ConstantsDialog(QtWidgets.QDialog, generated_dialog_qt.Ui_Constants_Dialog):
     def __init__(self, parent=None):
         QtWidgets.QDialog.__init__(self)
         Ui_dialog.__init__(self)
@@ -223,14 +226,14 @@ class ConstantsDialog(QtWidgets.QDialog, Ui_dialog):
 # %%
 # Workaround Qt main loop for Spyder development
 # Prevent segfault from running 2 instances of PyQt at once
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    if not QtWidgets.QApplication.instance():
-        app = QtWidgets.QApplication(sys.argv)
+if not QtWidgets.QApplication.instance():
+    app = QtWidgets.QApplication(sys.argv)
 
-    else:
-        app = QtWidgets.QApplication.instance()
+else:
+    app = QtWidgets.QApplication.instance()
 
-    window = RateCalculator()
-    window.show()
-    sys.exit(app.exec_())
+window = RateCalculator()
+window.show()
+sys.exit(app.exec_())
