@@ -1,0 +1,193 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Nov 19 02:38:30 2017
+
+@author: William
+
+"""
+
+import inspect
+
+from PyQt5 import QtCore, QtWidgets
+
+import lodging_functions
+
+
+data = QtCore.QSettings('data.ini', QtCore.QSettings.IniFormat)
+
+
+def percent_format(rate_data):
+    """
+    Modifies values in a dictionary, converting keys containing percentages to floats
+
+    :param rate_data: dictionary
+        a dictionary of values, some of which contain percentage values
+
+    :return: dictionary
+        a dictionary
+    """
+    rate_data['aaa_discount_edit'] = rate_data['aaa_discount_edit'] / 100
+    rate_data['lbms_discount_edit'] = rate_data['lbms_discount_edit'] / 100
+    rate_data['sales_tax_edit'] = rate_data['sales_tax_edit'] / 100
+    rate_data['soe_commission_edit'] = rate_data['soe_commission_edit'] / 100
+    rate_data['soe_discount_edit'] = rate_data['soe_discount_edit'] / 100
+    return rate_data
+
+
+def get_settings(settings):
+    """
+    Returns a dictionary reflecting the structure of a QSettings file
+    Assumes gui state settings
+    Removes leading currency symbols to store values as float
+
+    :param settings: QSettings object
+        A database managed by QSettings
+
+    :return: dictionary
+        A dictionary of key value pairs reflecting those in the QSettings object
+    """
+    rate_data = {}
+    for name in settings.allKeys():
+        if name == "size":
+            rate_data[name] = settings.value(name, type=QtCore.QSize)
+        if name == "pos":
+            rate_data[name] = settings.value(name, type=QtCore.QPoint)
+        if not (name == "size" or name == "pos"):
+            rate_data[name] = float(settings.value(name, type=str).replace("$", ""))
+    return percent_format(rate_data)
+
+
+def derive_rack(name, rate_data):
+    if name == "rack_rate_edit":
+        return rate_data[name]
+
+    if name == "rack_total_edit":
+        return lodging_functions.remove_tax(rate_data[name], rate_data["sales_tax_edit"], rate_data["lodging_tax_edit"])
+
+    if name == "aaa_rate_edit":
+        return lodging_functions.remove_discount(rate_data[name], rate_data["aaa_discount_edit"])
+
+    if name == "aaa_total_edit":
+        return lodging_functions.remove_discount(lodging_functions.remove_tax(rate_data[name], rate_data["sales_tax_edit"], rate_data["lodging_tax_edit"]), rate_data["aaa_discount_edit"])
+
+    if name == "lbms_rate_edit":
+        return lodging_functions.remove_discount(rate_data[name], rate_data["lbms_discount_edit"])
+
+    if name == "lbms_total_edit":
+        return lodging_functions.remove_discount(lodging_functions.remove_tax(rate_data[name], rate_data["sales_tax_edit"], rate_data["lodging_tax_edit"]), rate_data["lbms_discount_edit"])
+
+    if name == "soe_rate_edit":
+        return lodging_functions.rate_from_expedia(rate_data[name], rate_data["soe_discount_edit"], rate_data["soe_commission_edit"])
+
+    if name == "soe_total_edit":
+        # noinspection PyPep8
+        return lodging_functions.rate_from_expedia(lodging_functions.remove_tax(rate_data[name], rate_data["sales_tax_edit"], rate_data["lodging_tax_edit"]), rate_data["soe_discount_edit"], rate_data["soe_commission_edit"])
+
+
+def calculate(key, rack, sales, lodge, aaa, man, soe_dis, soe_com):
+    """
+    Auxiliary function for set_values.
+    Given a key, a default rate, and discount amounts
+    Returns a string using the appropriate function from lodging_functions
+    in this module, keys are assigned per QLineEdit
+
+    :param key: string
+        A string representing the name of the value in the database
+    :param rack: number
+        The default rate
+    :param sales: number
+        a percentage sales tax
+    :param lodge: number
+        a flat rate lodging tax
+    :param aaa: number
+        a percentage discount
+    :param man: number
+        another percentage discount
+    :param soe_dis: number
+        another percentage discount
+    :param soe_com: number
+        another percentage discount
+    :return: string
+        a string of pretty printed local currency
+        """
+
+    if key == "rack_rate_edit":
+        entry = rack
+
+    if key == "rack_total_edit":
+        entry = lodging_functions.add_tax(rack, sales, lodge)
+
+    if key == "aaa_rate_edit":
+        entry = lodging_functions.apply_disacount(rack, aaa)
+
+    if key == "aaa_total_edit":
+        entry = lodging_functions.add_tax(lodging_functions.apply_discount(rack, aaa), sales, lodge)
+
+    if key == "lbms_rate_edit":
+        entry = lodging_functions.apply_discount(rack, man)
+
+    if key == "lbms_total_edit":
+        entry = lodging_functions.add_tax(lodging_functions.apply_discount(rack, man), sales, lodge)
+
+    if key == "soe_rate_edit":
+        entry = lodging_functions.expedia_price(rack, soe_dis, soe_com)
+
+    if key == "soe_total_edit":
+        entry = lodging_functions.add_tax(lodging_functions.expedia_price(rack, soe_dis, soe_com), sales, lodge)
+
+    return lodging_functions.make_currency_pretty(entry)
+
+
+def set_values(self, name, settings):
+    """
+    Defines a set of constants for the calculate function from the given database,
+    Determines the default rate depending on the name of the QLineEdit using lodging_functions,
+    For each QLineEdit of the parent class, sets its value in the database to the value returned by calculate
+        when given its key-name.
+
+    :param name: string
+        The name of a QWidget object of the parent class
+
+    :param settings: QSettings object
+        A database managed by QSettings in the operating system's persistent memory
+
+    :return: void
+
+    """
+    rate_data = get_settings(settings)
+
+    if name == "rack_rate_edit":
+        rack = value
+
+    if name == "rack_total_edit":
+        rack = lodging_functions.remove_tax(value, sales, lodge)
+
+    if name == "aaa_rate_edit":
+        rack = lodging_functions.remove_discount(value, aaa)
+
+    if name == "aaa_total_edit":
+        rack = lodging_functions.remove_discount(lodging_functions.remove_tax(value, sales, lodge), aaa)
+
+    if name == "lbms_rate_edit":
+        rack = lodging_functions.remove_discount(value, man)
+
+    if name == "lbms_total_edit":
+        rack = lodging_functions.remove_discount(lodging_functions.remove_tax(value, sales, lodge), man)
+
+    if name == "soe_rate_edit":
+        rack = lodging_functions.rate_from_expedia(value, soe_dis, soe_com)
+
+    if name == "soe_total_edit":
+        # noinspection PyPep8
+        rack = lodging_functions.rate_from_expedia(lodging_functions.remove_tax(value, sales, lodge), soe_dis, soe_com)
+
+    else:
+        print("Error! Focus object not known QLineEdit!")
+
+    for key, obj in inspect.getmembers(self):
+        if isinstance(obj, QtWidgets.QLineEdit):
+            settings.setValue(key, self.calculate(key, rack, sales, lodge, aaa, man, soe_dis, soe_com))
+
+
+if __name__ is "__main__":
+    print(derive_rack("soe_total_rate", get_settings(data)))
