@@ -245,7 +245,8 @@ def remove_discount(rate, discount):
     117.95
 
     """
-    return rate + (rate / discount)
+    acc = 1 - discount
+    return rate / acc
 
 
 # %%

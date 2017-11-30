@@ -71,5 +71,5 @@ setup(
         install_requires=['pyqt5', "cx_freeze"],
         python_requires='~=3.3',
         package_data={'data.ini': ['data.ini'], 'Qt_plugins': ['Qt_plugins/*.ui']},
-        py_modules=["lodging_functions", "qt_calculator", "qt_manipulation"]
+        py_modules=["lodging_functions", "qt_calculator", "qt_persistence"]
 )
