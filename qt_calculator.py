@@ -7,16 +7,16 @@ Created on Sun Nov 19 02:38:30 2017
 """
 
 # %%
+import decimal
 import inspect
 import sys
 
 from PyQt5 import uic, QtWidgets, QtCore
 
-import lodging_functions
-import qt_persistence
 import generated_dialog_qt
 import generated_window_qt
-
+import lodging_functions
+import qt_persistence
 
 # %%
 # noinspection SpellCheckingInspection
@@ -129,13 +129,13 @@ class RateCalculator(QtWidgets.QMainWindow, generated_window_qt.Ui_Rate_Calculat
         :return: void
 
         """
-        value = float(settings.value(name, type=str).replace("$", ""))
-        sales = float(settings.value('sales_tax_edit', type=str).replace("$", "")) / 100
-        lodge = float(settings.value('lodging_tax_edit', type=str).replace("$", ""))
-        aaa = float(settings.value('aaa_discount_edit', type=str).replace("$", "")) / 100
-        man = float(settings.value('lbms_discount_edit', type=str).replace("$", "")) / 100
-        soe_dis = float(settings.value('soe_discount_edit', type=str).replace("$", "")) / 100
-        soe_com = float(settings.value('soe_commission_edit', type=str).replace("$", "")) / 100
+        value = decimal.Decimal(settings.value(name, type=str).replace("$", ""))
+        sales = decimal.Decimal(settings.value('sales_tax_edit', type=str).replace("$", "")) / 100
+        lodge = decimal.Decimal(settings.value('lodging_tax_edit', type=str).replace("$", ""))
+        aaa = decimal.Decimal(settings.value('aaa_discount_edit', type=str).replace("$", "")) / 100
+        man = decimal.Decimal(settings.value('lbms_discount_edit', type=str).replace("$", "")) / 100
+        soe_dis = decimal.Decimal(settings.value('soe_discount_edit', type=str).replace("$", "")) / 100
+        soe_com = decimal.Decimal(settings.value('soe_commission_edit', type=str).replace("$", "")) / 100
 
         if name == "rack_rate_edit":
             rack = value

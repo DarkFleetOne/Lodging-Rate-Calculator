@@ -7,6 +7,7 @@ Created on Wed Nov 15 18:52:56 2017
 
 # %%
 import locale
+import decimal
 
 
 # %%
@@ -15,16 +16,16 @@ locale.setlocale(locale.LC_ALL, '')
 
 # %%
 # Tax Constants assume Davidson County, TN
-SALES_TAX = .1525
-LODGING_TAX = 2.5
-AAA_DISCOUNT = .10
+SALES_TAX = decimal.Decimal(.1525)
+LODGING_TAX = decimal.Decimal(2.5)
 # Discount & Commission Constants
-MANAGERS_DISCOUNT = .15
-EXPEDIA_DISCOUNT = .10
-EXPEDIA_COMMISSION = .17
+AAA_DISCOUNT = decimal.Decimal(.10)
+MANAGERS_DISCOUNT = decimal.Decimal(.15)
+EXPEDIA_DISCOUNT = decimal.Decimal(.10)
+EXPEDIA_COMMISSION = decimal.Decimal(.17)
 # Test Values
-RACK_RATE = 117.95
-RACK_TOTAL = 138.44
+RACK_RATE = decimal.Decimal(117.95)
+RACK_TOTAL = decimal.Decimal(138.44)
 ROOM_TOTALS_LIST = [x for x in range(100, 200, 5)]
 
 
@@ -111,7 +112,7 @@ def make_currency_pretty(number):
     $101.95
 
     """
-    acc = round(number, 2)
+    acc = number.quantize(decimal.Decimal(0.01), rounding=decimal.ROUND_HALF_UP, context=decimal.Context(prec=100))
     return locale.currency(acc, grouping=True)
 
 
