@@ -60,7 +60,7 @@ class RateCalculator(QtWidgets.QMainWindow, generated_window_qt.Ui_Rate_Calculat
         self.dialog.show()
 
     @staticmethod
-    def calculate(key, rack, sales, lodge, aaa, man, soe_dis, soe_com):
+    def calculate(key, rack, sales, lodge, aaa, man, soe_dis, soe_com, swr):
         """
         Auxiliary function for set_values.
         Given a key, a default rate, and discount amounts
@@ -111,6 +111,12 @@ class RateCalculator(QtWidgets.QMainWindow, generated_window_qt.Ui_Rate_Calculat
         if key == "soe_total_edit":
             entry = lodging_functions.add_tax(lodging_functions.expedia_price(rack, soe_dis, soe_com), sales, lodge)
 
+        if key == "swr1_rate_edit":
+            entry = lodging_functions.apply_discount(rack, swr)
+
+        if key == "swr1_total_edit":
+            entry = lodging_functions.add_tax(lodging_functions.apply_discount(rack, swr), sales, lodge)
+
         return lodging_functions.make_currency_pretty(entry)
 
     def set_values(self, name, settings):
@@ -136,6 +142,7 @@ class RateCalculator(QtWidgets.QMainWindow, generated_window_qt.Ui_Rate_Calculat
         man = decimal.Decimal(settings.value('lbms_discount_edit', type=str).replace("$", "")) / 100
         soe_dis = decimal.Decimal(settings.value('soe_discount_edit', type=str).replace("$", "")) / 100
         soe_com = decimal.Decimal(settings.value('soe_commission_edit', type=str).replace("$", "")) / 100
+        swr = decimal.Decimal(settings.value('swr1_discount_edit', type=str).replace("$", "")) / 100
 
         if name == "rack_rate_edit":
             rack = value
@@ -162,12 +169,18 @@ class RateCalculator(QtWidgets.QMainWindow, generated_window_qt.Ui_Rate_Calculat
             # noinspection PyPep8
             rack = lodging_functions.rate_from_expedia(lodging_functions.remove_tax(value, sales, lodge), soe_dis, soe_com)
 
+        if name == "swr1_rate_edit":
+            rack = lodging_functions.remove_discount(value, swr)
+
+        if name == "swr1_total_edit":
+            rack = lodging_functions.remove_discount(lodging_functions.remove_tax(value, sales, lodge), swr)
+
         else:
             print("Error! Focus object not known QLineEdit!")
 
         for key, obj in inspect.getmembers(self):
             if isinstance(obj, QtWidgets.QLineEdit):
-                settings.setValue(key, self.calculate(key, rack, sales, lodge, aaa, man, soe_dis, soe_com))
+                settings.setValue(key, self.calculate(key, rack, sales, lodge, aaa, man, soe_dis, soe_com, swr))
 
     def calculate_clicked(self):
         qt_persistence.gui_save(self, data)
